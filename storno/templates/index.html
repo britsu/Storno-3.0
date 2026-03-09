@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STORNO - Calculadora de Estorno ICMS</title>
+    <!-- Google Fonts: Outfit for a modern, geometric look -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Modern Design System Tokens */
+        :root {
+            /* Colors */
+            --bg-color: #f4f7fa;
+            --surface-color: #ffffff;
+            --primary: #0f172a;
+            --primary-light: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --error: #ef4444;
+            --error-light: #fee2e2;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+            
+            /* Border Radius */
+            --radius-md: 12px;
+            --radius-lg: 24px;
+            --radius-full: 9999px;
+            
+            /* Animation */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* ===== Header ===== */
+        header {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1.25rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            padding: 0 2rem;
+        }
+
+        .logo-icon {
+            background: var(--primary-gradient);
+            color: white;
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
+            transform: rotate(-5deg);
+            transition: var(--transition);
+        }
+
+        .logo-icon:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 2.25rem;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            font-weight: 800;
+            line-height: 1.1;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-text p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== Main Container ===== */
+        main {
+            width: 100%;
+            max-width: 1000px;
+            padding: 3rem 2rem;
+            flex: 1;
+        }
+
+        /* ===== Upload Widget ===== */
+        .upload-widget {
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .upload-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 6px;
+            background: var(--primary-gradient);
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .upload-area:hover::after, .upload-area.dragover::after {
+            opacity: 0.03;
+        }
+
+        .upload-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .upload-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: var(--shadow-md);
+            color: var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .upload-area:hover .upload-icon-wrapper {
+            transform: translateY(-8px) scale(1.05);
+            color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .upload-area h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .upload-area p {
+            color: var(--text-muted);
+            margin: 0 0 2rem 0;
+            font-size: 1.05rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary-light);
+            border: 2px solid var(--primary-light);
+            padding: 0.75rem 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.15rem;
+            width: 100%;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn-primary:hover:not(:disabled)::after {
+            left: 150%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* File Info Badge */
+        .file-info {
+            display: none; /* hidden by default */
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .file-info.active {
+            display: flex;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            color: var(--success);
+            background: var(--success-light);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.05rem;
+        }
+
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .file-remove {
+            background: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .file-remove:hover {
+            background: var(--error-light);
+            color: var(--error);
+            border-color: var(--error-light);
+            transform: rotate(90deg);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        .processing-text {
+            display: none;
+        }
+        .default-text {
+            display: inline-block;
+        }
+
+        .is-loading .spinner { display: inline-block; }
+        .is-loading .processing-text { display: inline-block; }
+        .is-loading .default-text { display: none; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== Results Area ===== */
+        .result-card {
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .status-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .success-icon {
+            background: var(--success-light);
+            color: var(--success);
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .error-icon {
+            background: var(--error-light);
+            color: var(--error);
+            box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
+        }
+
+        .result-header h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.75rem;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .result-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* KPI Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            padding: 1.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-box:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-value.highlight {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Table Styling */
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-container {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-sm);
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .category-tag {
+            background: var(--border-color);
+            color: var(--primary);
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Specific tag colors */
+        .tag-laticinios { background: #fee2e2; color: #b91c1c; }
+        .tag-arroz { background: #fef3c7; color: #b45309; }
+        .tag-feijao { background: #dcfce7; color: #15803d; }
+        .tag-cafe { background: #fce7f3; color: #be185d; }
+        .tag-outros { background: #e2e8f0; color: #475569; }
+
+        .money-val {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        .money-estorno {
+            color: var(--success);
+            background: var(--success-light);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .btn-download {
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            padding: 1.25rem 2.5rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+            width: 100%;
+        }
+
+        .btn-download:hover {
+            background: #059669;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-download svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Error state */
+        .error-message {
+            color: var(--error);
+            font-weight: 500;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .upload-widget, .result-card {
+                padding: 1.5rem;
+            }
+            .upload-area {
+                padding: 2.5rem 1rem;
+            }
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .stat-value {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>STORNO</h1>
+                <p>Cálculo Automático de ICMS CST 020</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="upload-widget">
+            <div class="upload-area" id="drop-zone">
+                <div class="upload-content">
+                    <div class="upload-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                    </div>
+                    <h3>Envie sua planilha de dados</h3>
+                    <p>Arraste e solte o arquivo XLSX ou CSV aqui</p>
+                    <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        Procurar Arquivo
+                    </button>
+                    <input type="file" id="file-input" accept=".xlsx, .csv">
+                </div>
+            </div>
+
+            <div class="file-info" id="file-info">
+                <div class="file-details">
+                    <div class="file-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="file-name" id="file-name-text">planilha.xlsx</div>
+                        <div class="file-size" id="file-size-text">0 KB</div>
+                    </div>
+                </div>
+                <button class="file-remove" id="btn-remove-file" title="Remover arquivo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <button class="btn btn-primary" id="btn-process" disabled>
+                <span class="default-text">Processar Planilha</span>
+                <span class="processing-text">Analisando Dados...</span>
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <!-- Success Result -->
+        <div class="result-card card-success" id="success-card">
+            <div class="result-header">
+                <div class="status-icon success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                </div>
+                <div>
+                    <h3>Processamento Concluído</h3>
+                    <p>O cálculo de estorno foi gerado com sucesso.</p>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Produtos Lidos</div>
+                    <div class="stat-value" id="stat-total-linhas">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Itens c/ Estorno</div>
+                    <div class="stat-value" id="stat-linhas-estorno">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total a Estornar</div>
+                    <div class="stat-value highlight" id="stat-total-valor">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="table-title">
+                Pré-visualização (Primeiros itens)
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nota Fiscal</th>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>NCM</th>
+                            <th>Categoria</th>
+                            <th>Crédito Orig.</th>
+                            <th>Aliquota</th>
+                            <th>Val. Estorno</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-tbody">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="#" class="btn-download" id="btn-download">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Fazer Download da Planilha Completa
+            </a>
+        </div>
+
+        <!-- Error Result -->
+        <div class="result-card card-error" id="error-card">
+            <div class="result-header">
+                <div class="status-icon error-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3>Problema Identificado</h3>
+                    <p>Não foi possível processar o arquivo enviado.</p>
+                </div>
+            </div>
+            <div class="error-message" id="error-message"></div>
+        </div>
+
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        
+        const fileInfo = document.getElementById('file-info');
+        const fileNameText = document.getElementById('file-name-text');
+        const fileSizeText = document.getElementById('file-size-text');
+        const btnRemoveFile = document.getElementById('btn-remove-file');
+        
+        const btnProcess = document.getElementById('btn-process');
+        
+        const successCard = document.getElementById('success-card');
+        const errorCard = document.getElementById('error-card');
+        const errorMessage = document.getElementById('error-message');
+        const previewTbody = document.getElementById('preview-tbody');
+        const btnDownload = document.getElementById('btn-download');
+
+        let selectedFile = null;
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if(e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        btnRemoveFile.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.classList.remove('active');
+            btnProcess.disabled = true;
+            hideCards();
+        });
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        function handleFile(file) {
+            const validTypes = ['.xlsx', '.csv'];
+            const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            
+            if (!validTypes.includes(fileExt)) {
+                showError("Formato de arquivo inválido. Insira apenas arquivos com extensão .xlsx ou .csv.");
+                selectedFile = null;
+                fileInfo.classList.remove('active');
+                btnProcess.disabled = true;
+                return;
+            }
+
+            selectedFile = file;
+            fileNameText.textContent = file.name;
+            fileSizeText.textContent = formatBytes(file.size);
+            
+            fileInfo.classList.add('active');
+            btnProcess.disabled = false;
+            hideCards();
+        }
+
+        // Processing Submit
+        btnProcess.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            setLoading(true);
+            hideCards();
+
+            // Simulate slight network delay for UI smoothness
+            await new Promise(r => setTimeout(r, 600));
+
+            try {
+                const response = await fetch('/processar', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+
+                if (data.sucesso) {
+                    showSuccess(data);
+                } else {
+                    showError(data.erro);
+                }
+            } catch (error) {
+                showError("Erro fatal de conexão com o servidor.");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        function getCategoryClass(category) {
+            const map = {
+                'Laticínios': 'tag-laticinios',
+                'Arroz': 'tag-arroz',
+                'Feijão': 'tag-feijao',
+                'Café': 'tag-cafe',
+                'Farinha de Trigo': 'tag-arroz',
+                'Açúcar': 'tag-arroz',
+                'Óleo de Soja': 'tag-arroz',
+                'Macarrão': 'tag-arroz'
+            };
+            return map[category] || 'tag-outros';
+        }
+
+        function showSuccess(data) {
+            document.getElementById('stat-total-linhas').textContent = data.resumo.total_linhas;
+            document.getElementById('stat-linhas-estorno').textContent = data.resumo.linhas_com_estorno;
+            document.getElementById('stat-total-valor').textContent = currencyFormatter.format(data.resumo.total_estorno);
+            
+            previewTbody.innerHTML = '';
+            data.preview.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: var(--primary-light)">#${row.Numero_Nota}</td>
+                    <td>${row.Data_Nota}</td>
+                    <td title="${row.Produto}">${row.Produto.length > 25 ? row.Produto.substring(0,25) + "..." : row.Produto}</td>
+                    <td style="font-family: monospace; font-size: 1.05rem;">${row.NCM}</td>
+                    <td><span class="category-tag ${getCategoryClass(row.Categoria)}">${row.Categoria}</span></td>
+                    <td class="money-val">${currencyFormatter.format(row.Credito_ICMS)}</td>
+                    <td style="font-weight: 700; color: var(--text-muted)">${row.Percentual_Estorno}</td>
+                    <td><span class="money-estorno">${currencyFormatter.format(row.Valor_Estorno)}</span></td>
+                `;
+                previewTbody.appendChild(tr);
+            });
+
+            btnDownload.href = `/download/${data.arquivo_saida}`;
+            successCard.style.display = 'block';
+            
+            // Scroll para os resultados
+            setTimeout(() => {
+                successCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorCard.style.display = 'block';
+        }
+
+        function hideCards() {
+            successCard.style.display = 'none';
+            errorCard.style.display = 'none';
+        }
+
+        function setLoading(isLoading) {
+            btnProcess.disabled = isLoading;
+            if (isLoading) {
+                btnProcess.classList.add('is-loading');
+                dropZone.style.pointerEvents = 'none';
+                dropZone.style.opacity = '0.7';
+                btnRemoveFile.style.display = 'none';
+            } else {
+                btnProcess.classList.remove('is-loading');
+                dropZone.style.pointerEvents = 'auto';
+                dropZone.style.opacity = '1';
+                btnRemoveFile.style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>
