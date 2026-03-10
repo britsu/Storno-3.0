@@ -1,142 +1,155 @@
 import pandas as pd
 import numpy as np
 import os
+import json
 from datetime import datetime
 
-# Regras Fiscal - RICMS-TO (CST 020)
+# Regras Fiscal - RICMS-TO
 REGRAS = {
     "Laticínios": {"prefixos": ["0401", "0402", "0403", "0404", "0405", "0406"], "percentual": 0.40},
-    "Arroz": {"prefixos": ["1006"], "percentual": 0.65},
-    "Feijão": {"prefixos": ["0713"], "percentual": 0.65},
-    "Farinha de Trigo": {"prefixos": ["1101"], "percentual": 0.65},
-    "Açúcar": {"prefixos": ["1701"], "percentual": 0.65},
-    "Óleo de Soja": {"prefixos": ["1507"], "percentual": 0.65},
-    "Café": {"prefixos": ["0901"], "percentual": 0.65},
-    "Macarrão": {"prefixos": ["1902"], "percentual": 0.65},
+    "Arroz": {"prefixos": ["1006"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Feijão": {"prefixos": ["0713"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Farinha de Trigo": {"prefixos": ["1101"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Farinha de Mandioca": {"prefixos": ["110620"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Fubá de Milho": {"prefixos": ["110220"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Açúcar Cristal": {"prefixos": ["170114", "170199", "1701"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Óleo de Soja": {"prefixos": ["1507"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Café": {"prefixos": ["0901"], "percentual": 0.65, "macro": "Cesta Básica"},
+    "Sal": {"prefixos": ["2501"], "percentual": 0.65, "macro": "Cesta Básica"},
 }
 
 def limpa_ncm(ncm):
-    if pd.isna(ncm):
-        return ""
-    return str(ncm).replace(".", "").replace("-", "").strip()
-
-def classificar_produto(ncm):
-    ncm_str = limpa_ncm(ncm)
-    for categoria, regra in REGRAS.items():
-        for prefixo in regra["prefixos"]:
-            if ncm_str.startswith(prefixo):
-                return categoria, regra["percentual"]
-    return "Outros", 0.0
+    if pd.isna(ncm): return ""
+    v = str(ncm).strip()
+    if v.endswith(".0"): 
+        v = v[:-2]
+    v = v.replace(".", "").replace("-", "")
+    if v.isdigit() and len(v) < 8:
+        v = v.zfill(8)
+    return v
 
 def processar_planilha(filepath, output_dir):
     try:
-        # Carregar arquivo
+        # 1. Leitura robusta
         if filepath.lower().endswith('.csv'):
-            df = pd.read_csv(filepath, dtype={'NCM': str})
-        elif filepath.lower().endswith('.xlsx'):
-            df = pd.read_excel(filepath, dtype={'NCM': str})
+            # Tenta vários separadores comuns em arquivos fiscais
+            for sep in [',', ';', '\t']:
+                try:
+                    df = pd.read_csv(filepath, sep=sep, dtype=str, encoding='utf-8')
+                    if len(df.columns) > 1: break
+                except: continue
         else:
-            return {"sucesso": False, "erro": "Formato não suportado. Envie XLSX ou CSV."}
-            
-        colunas_obrigatorias = [
-            "Numero_Nota", "Data_Nota", "Fornecedor", 
-            "Produto", "NCM", "Credito_ICMS"
-        ]
-        
-        # Validar colunas
-        for col in colunas_obrigatorias:
-            if col not in df.columns:
-                return {"sucesso": False, "erro": f"Coluna obrigatória não encontrada: {col}"}
-                
-        if df.empty:
-            return {"sucesso": False, "erro": "A planilha enviada está vazia."}
-            
-        # Preparar NCM e Credito_ICMS
-        df['NCM_Limpo'] = df['NCM'].apply(limpa_ncm)
+            df = pd.read_excel(filepath, dtype=str)
+
+        # 2. Limpeza profunda dos nomes das colunas (remove espaços, aspas e quebras de linha)
+        df.columns = df.columns.str.strip().str.replace('"', '').str.replace("'", "")
+
+        # 3. Mapeamento Flexível (Aceita 'Numero' ou 'Numero_Nota', etc)
+        mapeamento = {
+            "Numero_Nota": ["Numero", "Numero_Nota", "No.", "Num"],
+            "Data_Nota": ["Dt_Emissao", "Data_Nota", "Data"],
+            "Fornecedor": ["Rz_Emit", "Fornecedor", "Emitente"],
+            "Produto": ["Produto", "Descricao", "Nome_Produto"],
+            "NCM": ["NCM", "NCM_SH"],
+            "Credito_ICMS": ["Valor_ICMS", "Credito_ICMS", "Vlr_ICMS"]
+        }
+
+        colunas_finais = {}
+        for destino, origens in mapeamento.items():
+            encontrou = False
+            for o in origens:
+                if o in df.columns:
+                    colunas_finais[o] = destino
+                    encontrou = True
+                    break
+            if not encontrou:
+                return {"sucesso": False, "erro": f"Coluna essencial não encontrada. Verifique se existe algo como: {origens}"}
+
+        df = df.rename(columns=colunas_finais)
+
+        # 4. Tratamento de valores numéricos
         df['Credito_ICMS'] = pd.to_numeric(df['Credito_ICMS'].astype(str).str.replace(',', '.'), errors='coerce').fillna(0)
         
-        # Aplicar regras
-        df['Classificacao'] = df['NCM_Limpo'].apply(classificar_produto)
+        # Opcional: tentar converter Valor_Produto ou Valor_Unitario se precisarmos
+        for col in ['Valor_Produto', 'Valor_Unitario', 'Quantidade', 'Valor_Total_Nota']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', '.'), errors='coerce').fillna(0)
+        
+        # 5. Classificação e Cálculo
+        df['NCM_Limpo'] = df['NCM'].apply(limpa_ncm)
+        
+        def classificar(ncm):
+            for cat, reg in REGRAS.items():
+                for pref in reg["prefixos"]:
+                    if ncm.startswith(pref): 
+                        return cat, reg["percentual"], reg.get("macro", "Laticínios")
+            return "Outros", 0.0, "Outros"
+
+        df['Classificacao'] = df['NCM_Limpo'].apply(classificar)
         df['Categoria'] = df['Classificacao'].apply(lambda x: x[0])
         df['Percentual_Estorno'] = df['Classificacao'].apply(lambda x: x[1])
-        
-        # Calcular valores
+        df['Macro_Categoria'] = df['Classificacao'].apply(lambda x: x[2])
         df['Valor_Estorno'] = df['Credito_ICMS'] * df['Percentual_Estorno']
         df['Credito_Aproveitavel'] = df['Credito_ICMS'] - df['Valor_Estorno']
-        
-        # Máscara para estorno
+
         df_estorno = df[df['Categoria'] != "Outros"].copy()
-        
+
         if df_estorno.empty:
-            return {"sucesso": False, "erro": "Nenhum produto na planilha gera estorno (NCM não corresponde às regras)."}
-        
-        # Resumo final
-        resumo_processamento = {
-            "total_linhas": len(df),
-            "linhas_com_estorno": len(df_estorno),
-            "total_estorno": float(df_estorno['Valor_Estorno'].sum())
-        }
-        
-        # ──────── ABA 1: Estorno por Produto ────────
-        aba1 = df_estorno[[
-            "Numero_Nota", "Data_Nota", "Fornecedor", "Produto", "NCM", 
-            "Categoria", "Credito_ICMS", "Percentual_Estorno", 
-            "Valor_Estorno", "Credito_Aproveitavel"
-        ]].copy()
-        
-        # ──────── ABA 2: Resumo por Nota ────────
-        aba2 = df.groupby(["Numero_Nota", "Data_Nota", "Fornecedor"]).agg(
-            Total_Credito_Nota=('Credito_ICMS', 'sum'),
-            Total_Estorno_Nota=('Valor_Estorno', 'sum'),
-            Total_Aproveitavel_Nota=('Credito_Aproveitavel', 'sum')
-        ).reset_index()
-        
-        # Adicionar Qtd_Produtos_Com_Estorno em Aba 2
-        qtd_estorno = df_estorno.groupby(["Numero_Nota", "Data_Nota", "Fornecedor"]).size().reset_index(name='Qtd_Produtos_Com_Estorno')
-        aba2 = pd.merge(aba2, qtd_estorno, on=["Numero_Nota", "Data_Nota", "Fornecedor"], how='left')
-        aba2['Qtd_Produtos_Com_Estorno'] = aba2['Qtd_Produtos_Com_Estorno'].fillna(0).astype(int)
-        
-        # ──────── ABA 3: Totais Gerais ────────
-        aba3 = df_estorno.groupby("Categoria").agg(
-            Qtd_Produtos=('Produto', 'count'),
-            Total_Credito=('Credito_ICMS', 'sum'),
-            Total_Estorno=('Valor_Estorno', 'sum'),
-            Total_Aproveitavel=('Credito_Aproveitavel', 'sum')
-        ).reset_index()
-        
-        linha_total = pd.DataFrame([{
-            "Categoria": "TOTAL",
-            "Qtd_Produtos": aba3['Qtd_Produtos'].sum(),
-            "Total_Credito": aba3['Total_Credito'].sum(),
-            "Total_Estorno": aba3['Total_Estorno'].sum(),
-            "Total_Aproveitavel": aba3['Total_Aproveitavel'].sum()
-        }])
-        aba3 = pd.concat([aba3, linha_total], ignore_index=True)
-        
-        # Formatar Aba 1 para preview no JSON
-        preview_df = aba1.head(10).copy()
-        preview_df['Percentual_Estorno'] = preview_df['Percentual_Estorno'].apply(lambda x: f"{x*100:.0f}%")
-        preview = preview_df.to_dict(orient='records')
-        
-        # Salvar as abas no Excel
+            return {"sucesso": False, "erro": "Nenhum produto gera estorno conforme os NCMs da planilha."}
+
+        # 6. Agrupamento por Nota
+        if 'Numero_Nota' in df_estorno.columns:
+            df_nota = df_estorno.groupby("Numero_Nota").agg({
+                "Data_Nota": "first",
+                "Fornecedor": "first",
+                "Credito_ICMS": "sum",
+                "Valor_Estorno": "sum"
+            }).reset_index()
+        else:
+            df_nota = pd.DataFrame() # Fallback case
+
+        # 7. Aggregações Top e Macros
+        df_macro = df_estorno.groupby("Macro_Categoria")["Valor_Estorno"].sum().reset_index()
+        macro_dict = {row['Macro_Categoria']: float(row['Valor_Estorno']) for _, row in df_macro.iterrows()}
+        total_laticinios = macro_dict.get("Laticínios", 0.0)
+        total_cesta = macro_dict.get("Cesta Básica", 0.0)
+
+        df_produtos = df_estorno.groupby("Produto")["Valor_Estorno"].sum().reset_index()
+        df_produtos = df_produtos.sort_values(by="Valor_Estorno", ascending=False).head(10)
+
+        if 'Fornecedor' in df_estorno.columns:
+            df_forn = df_estorno.groupby("Fornecedor")["Valor_Estorno"].sum().reset_index()
+            df_forn = df_forn.sort_values(by="Valor_Estorno", ascending=False).head(10)
+        else:
+            df_forn = pd.DataFrame()
+
+        # 8. Geração do Arquivo
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_filename = f"resultado_estorno_{timestamp}.xlsx"
         output_path = os.path.join(output_dir, output_filename)
-        
-        # Formatação de campos para o Excel final
-        aba1['Percentual_Estorno'] = aba1['Percentual_Estorno'].apply(lambda x: f"{x*100:.0f}%")
-        
+
         with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
-            aba1.to_excel(writer, sheet_name="Estorno por Produto", index=False)
-            aba2.to_excel(writer, sheet_name="Resumo por Nota", index=False)
-            aba3.to_excel(writer, sheet_name="Totais Gerais", index=False)
+            df_estorno.to_excel(writer, sheet_name="Por Produto", index=False)
+            if not df_nota.empty:
+                df_nota.to_excel(writer, sheet_name="Por Nota", index=False)
             
         return {
             "sucesso": True,
-            "resumo": resumo_processamento,
-            "preview": preview,
+            "resumo": {
+                "total_linhas": int(len(df)),
+                "linhas_com_estorno": int(len(df_estorno)),
+                "total_estorno": float(df_estorno['Valor_Estorno'].sum()),
+                "total_laticinios": total_laticinios,
+                "total_cesta_basica": total_cesta
+            },
+            "graficos": {
+                "top_produtos": json.loads(df_produtos.to_json(orient='records')),
+                "top_fornecedores": json.loads(df_forn.to_json(orient='records')) if not df_forn.empty else []
+            },
+            "preview_produto": json.loads(df_estorno.head(50).to_json(orient='records')),
+            "preview_nota": json.loads(df_nota.head(50).to_json(orient='records')) if not df_nota.empty else [],
             "arquivo_saida": output_filename
         }
-        
+
     except Exception as e:
-        return {"sucesso": False, "erro": f"Erro ao processar: {str(e)}"}
+        return {"sucesso": False, "erro": str(e)}

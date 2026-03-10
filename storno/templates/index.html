@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STORNO - Calculadora de Estorno ICMS</title>
     <!-- Google Fonts: Outfit for a modern, geometric look -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Modern Design System Tokens */
         :root {
@@ -23,18 +27,18 @@
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --border-light: #f1f5f9;
-            
+
             /* Shadows */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
-            
+
             /* Border Radius */
             --radius-md: 12px;
             --radius-lg: 24px;
             --radius-full: 9999px;
-            
+
             /* Animation */
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -42,7 +46,7 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
             background-attachment: fixed;
@@ -154,7 +158,10 @@
         .upload-widget::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 6px;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
             background: var(--primary-gradient);
             border-top-left-radius: var(--radius-lg);
             border-top-right-radius: var(--radius-lg);
@@ -182,13 +189,15 @@
             z-index: 1;
         }
 
-        .upload-area:hover, .upload-area.dragover {
+        .upload-area:hover,
+        .upload-area.dragover {
             border-color: var(--primary-light);
             transform: translateY(-2px);
             box-shadow: var(--shadow-glow);
         }
 
-        .upload-area:hover::after, .upload-area.dragover::after {
+        .upload-area:hover::after,
+        .upload-area.dragover::after {
             opacity: 0.03;
         }
 
@@ -273,8 +282,11 @@
         .btn-primary::after {
             content: '';
             position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
             transform: skewX(-20deg);
             transition: all 0.5s ease;
         }
@@ -306,7 +318,8 @@
 
         /* File Info Badge */
         .file-info {
-            display: none; /* hidden by default */
+            display: none;
+            /* hidden by default */
             align-items: center;
             justify-content: space-between;
             margin-top: 2rem;
@@ -351,7 +364,8 @@
             border: 1px solid var(--border-color);
             color: var(--text-muted);
             cursor: pointer;
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -371,7 +385,7 @@
             display: none;
             width: 24px;
             height: 24px;
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s linear infinite;
@@ -380,16 +394,27 @@
         .processing-text {
             display: none;
         }
+
         .default-text {
             display: inline-block;
         }
 
-        .is-loading .spinner { display: inline-block; }
-        .is-loading .processing-text { display: inline-block; }
-        .is-loading .default-text { display: none; }
+        .is-loading .spinner {
+            display: inline-block;
+        }
+
+        .is-loading .processing-text {
+            display: inline-block;
+        }
+
+        .is-loading .default-text {
+            display: none;
+        }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ===== Results Area ===== */
@@ -406,8 +431,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-header {
@@ -498,6 +530,33 @@
             font-weight: 600;
         }
 
+        /* View Toggles */
+        .view-toggles {
+            display: flex;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: var(--radius-full);
+        }
+
+        .toggle-btn {
+            border: none;
+            background: transparent;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
         /* Table Styling */
         .table-title {
             font-size: 1.25rem;
@@ -525,7 +584,8 @@
             font-size: 0.95rem;
         }
 
-        th, td {
+        th,
+        td {
             padding: 1.25rem 1.5rem;
             text-align: left;
             white-space: nowrap;
@@ -573,11 +633,30 @@
         }
 
         /* Specific tag colors */
-        .tag-laticinios { background: #fee2e2; color: #b91c1c; }
-        .tag-arroz { background: #fef3c7; color: #b45309; }
-        .tag-feijao { background: #dcfce7; color: #15803d; }
-        .tag-cafe { background: #fce7f3; color: #be185d; }
-        .tag-outros { background: #e2e8f0; color: #475569; }
+        .tag-laticinios {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .tag-arroz {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .tag-feijao {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .tag-cafe {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .tag-outros {
+            background: #e2e8f0;
+            color: #475569;
+        }
 
         .money-val {
             font-variant-numeric: tabular-nums;
@@ -628,30 +707,62 @@
             line-height: 1.5;
         }
 
+        /* Charts Area */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+            margin-top: 1rem;
+        }
+
+        .chart-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-box h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
-            .upload-widget, .result-card {
+
+            .upload-widget,
+            .result-card {
                 padding: 1.5rem;
             }
+
             .upload-area {
                 padding: 2.5rem 1rem;
             }
+
             .header-content {
                 flex-direction: column;
                 text-align: center;
             }
+
             .stat-value {
                 font-size: 1.75rem;
             }
         }
     </style>
 </head>
+
 <body>
 
     <header>
         <div class="header-content">
             <div class="logo-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
             </div>
             <div class="header-text">
@@ -666,15 +777,19 @@
             <div class="upload-area" id="drop-zone">
                 <div class="upload-content">
                     <div class="upload-icon-wrapper">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                         </svg>
                     </div>
                     <h3>Envie sua planilha de dados</h3>
                     <p>Arraste e solte o arquivo XLSX ou CSV aqui</p>
                     <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                         </svg>
                         Procurar Arquivo
                     </button>
@@ -685,8 +800,10 @@
             <div class="file-info" id="file-info">
                 <div class="file-details">
                     <div class="file-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                         </svg>
                     </div>
                     <div>
@@ -695,8 +812,9 @@
                     </div>
                 </div>
                 <button class="file-remove" id="btn-remove-file" title="Remover arquivo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -712,8 +830,9 @@
         <div class="result-card card-success" id="success-card">
             <div class="result-header">
                 <div class="status-icon success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                 </div>
                 <div>
@@ -724,35 +843,48 @@
 
             <div class="summary-stats">
                 <div class="stat-box">
-                    <div class="stat-label">Produtos Lidos</div>
-                    <div class="stat-value" id="stat-total-linhas">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Itens c/ Estorno</div>
-                    <div class="stat-value" id="stat-linhas-estorno">0</div>
-                </div>
-                <div class="stat-box">
                     <div class="stat-label">Total a Estornar</div>
                     <div class="stat-value highlight" id="stat-total-valor">R$ 0,00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Estorno Laticínios</div>
+                    <div class="stat-value" id="stat-total-laticinios" style="color: var(--error);">R$ 0,00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Estorno Cesta Básica</div>
+                    <div class="stat-value" id="stat-total-cesta" style="color: var(--success);">R$ 0,00</div>
+                </div>
+                <!-- Mini stat indicators for lines -->
+                <div style="display: flex; gap: 1rem; flex-direction: column; justify-content: center;">
+                    <div class="stat-label" style="font-size: 0.8rem">Lidos: <span id="stat-total-linhas"
+                            style="color:var(--primary); font-weight: 700;">0</span></div>
+                    <div class="stat-label" style="font-size: 0.8rem">C/ Estorno: <span id="stat-linhas-estorno"
+                            style="color:var(--primary); font-weight: 700;">0</span></div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h4>Top 10 Produtos</h4>
+                    <canvas id="produtosChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h4>Top 10 Fornecedores</h4>
+                    <canvas id="fornecedoresChart"></canvas>
                 </div>
             </div>
 
             <div class="table-title">
-                Pré-visualização (Primeiros itens)
+                <span>Pré-visualização</span>
+                <div class="view-toggles" id="view-toggles">
+                    <button class="toggle-btn active" data-view="produto">Por Produto</button>
+                    <button class="toggle-btn" data-view="nota">Por Nota</button>
+                </div>
             </div>
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Nota Fiscal</th>
-                            <th>Data</th>
-                            <th>Produto</th>
-                            <th>NCM</th>
-                            <th>Categoria</th>
-                            <th>Crédito Orig.</th>
-                            <th>Aliquota</th>
-                            <th>Val. Estorno</th>
-                        </tr>
+                    <thead id="preview-thead">
+                        <!-- Filled by JS -->
                     </thead>
                     <tbody id="preview-tbody">
                         <!-- Filled by JS -->
@@ -761,8 +893,10 @@
             </div>
 
             <a href="#" class="btn-download" id="btn-download">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
                 Fazer Download da Planilha Completa
             </a>
@@ -772,8 +906,10 @@
         <div class="result-card card-error" id="error-card">
             <div class="result-header">
                 <div class="status-icon error-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24"
+                        stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
                 <div>
@@ -789,14 +925,14 @@
     <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
-        
+
         const fileInfo = document.getElementById('file-info');
         const fileNameText = document.getElementById('file-name-text');
         const fileSizeText = document.getElementById('file-size-text');
         const btnRemoveFile = document.getElementById('btn-remove-file');
-        
+
         const btnProcess = document.getElementById('btn-process');
-        
+
         const successCard = document.getElementById('success-card');
         const errorCard = document.getElementById('error-card');
         const errorMessage = document.getElementById('error-message');
@@ -818,13 +954,13 @@
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-            if(e.dataTransfer.files.length > 0) {
+            if (e.dataTransfer.files.length > 0) {
                 handleFile(e.dataTransfer.files[0]);
             }
         });
 
         fileInput.addEventListener('change', (e) => {
-            if(e.target.files.length > 0) {
+            if (e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
             }
         });
@@ -849,7 +985,7 @@
         function handleFile(file) {
             const validTypes = ['.xlsx', '.csv'];
             const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            
+
             if (!validTypes.includes(fileExt)) {
                 showError("Formato de arquivo inválido. Insira apenas arquivos com extensão .xlsx ou .csv.");
                 selectedFile = null;
@@ -861,7 +997,7 @@
             selectedFile = file;
             fileNameText.textContent = file.name;
             fileSizeText.textContent = formatBytes(file.size);
-            
+
             fileInfo.classList.add('active');
             btnProcess.disabled = false;
             hideCards();
@@ -885,7 +1021,7 @@
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
 
                 if (data.sucesso) {
@@ -912,41 +1048,165 @@
                 'Feijão': 'tag-feijao',
                 'Café': 'tag-cafe',
                 'Farinha de Trigo': 'tag-arroz',
-                'Açúcar': 'tag-arroz',
+                'Farinha de Mandioca': 'tag-arroz',
+                'Fubá de Milho': 'tag-arroz',
+                'Açúcar Cristal': 'tag-arroz',
                 'Óleo de Soja': 'tag-arroz',
-                'Macarrão': 'tag-arroz'
+                'Sal': 'tag-arroz'
             };
             return map[category] || 'tag-outros';
         }
 
-        function showSuccess(data) {
-            document.getElementById('stat-total-linhas').textContent = data.resumo.total_linhas;
-            document.getElementById('stat-linhas-estorno').textContent = data.resumo.linhas_com_estorno;
-            document.getElementById('stat-total-valor').textContent = currencyFormatter.format(data.resumo.total_estorno);
-            
-            previewTbody.innerHTML = '';
-            data.preview.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight: 600; color: var(--primary-light)">#${row.Numero_Nota}</td>
-                    <td>${row.Data_Nota}</td>
-                    <td title="${row.Produto}">${row.Produto.length > 25 ? row.Produto.substring(0,25) + "..." : row.Produto}</td>
-                    <td style="font-family: monospace; font-size: 1.05rem;">${row.NCM}</td>
-                    <td><span class="category-tag ${getCategoryClass(row.Categoria)}">${row.Categoria}</span></td>
-                    <td class="money-val">${currencyFormatter.format(row.Credito_ICMS)}</td>
-                    <td style="font-weight: 700; color: var(--text-muted)">${row.Percentual_Estorno}</td>
-                    <td><span class="money-estorno">${currencyFormatter.format(row.Valor_Estorno)}</span></td>
-                `;
-                previewTbody.appendChild(tr);
-            });
+        let currentResultData = null;
+        let currentViewMode = 'produto'; // 'produto' ou 'nota'
 
-            btnDownload.href = `/download/${data.arquivo_saida}`;
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentViewMode = e.target.getAttribute('data-view');
+                if (currentResultData) {
+                    renderTable();
+                }
+            });
+        });
+
+        function renderTable() {
+            const thead = document.getElementById('preview-thead');
+            const tbody = document.getElementById('preview-tbody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            if (currentViewMode === 'produto') {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Nota Fiscal</th>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>NCM</th>
+                        <th>Categoria</th>
+                        <th>Crédito Orig.</th>
+                        <th>Aliquota</th>
+                        <th>Val. Estorno</th>
+                    </tr>
+                `;
+
+                const previewData = currentResultData.preview_produto || [];
+                previewData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: var(--primary-light)">#${row.Numero_Nota}</td>
+                        <td>${row.Data_Nota}</td>
+                        <td title="${row.Produto}">${(row.Produto && row.Produto.length > 25) ? row.Produto.substring(0, 25) + "..." : (row.Produto || '')}</td>
+                        <td style="font-family: monospace; font-size: 1.05rem;">${row.NCM}</td>
+                        <td><span class="category-tag ${getCategoryClass(row.Categoria)}">${row.Categoria}</span></td>
+                        <td class="money-val">${currencyFormatter.format(row.Credito_ICMS)}</td>
+                        <td style="font-weight: 700; color: var(--text-muted)">${row.Percentual_Estorno}</td>
+                        <td><span class="money-estorno">${currencyFormatter.format(row.Valor_Estorno)}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Nota Fiscal</th>
+                        <th>Data</th>
+                        <th>Fornecedor</th>
+                        <th>Crédito Total Orig.</th>
+                        <th>Estorno Total</th>
+                    </tr>
+                `;
+
+                const previewData = currentResultData.preview_nota || [];
+                previewData.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: var(--primary-light)">#${row.Numero_Nota}</td>
+                        <td>${row.Data_Nota}</td>
+                        <td title="${row.Fornecedor}">${(row.Fornecedor && row.Fornecedor.length > 30) ? row.Fornecedor.substring(0, 30) + "..." : (row.Fornecedor || '')}</td>
+                        <td class="money-val">${currencyFormatter.format(row.Credito_ICMS)}</td>
+                        <td><span class="money-estorno">${currencyFormatter.format(row.Valor_Estorno)}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        let chartProdutos = null;
+        let chartFornecedores = null;
+
+        function showSuccess(data) {
+            currentResultData = data;
+
+            document.getElementById('stat-total-linhas').textContent = data.resumo.total_linhas || 0;
+            document.getElementById('stat-linhas-estorno').textContent = data.resumo.linhas_com_estorno || 0;
+            document.getElementById('stat-total-valor').textContent = currencyFormatter.format(data.resumo.total_estorno);
+            document.getElementById('stat-total-laticinios').textContent = currencyFormatter.format(data.resumo.total_laticinios || 0);
+            document.getElementById('stat-total-cesta').textContent = currencyFormatter.format(data.resumo.total_cesta_basica || 0);
+
+            renderTable();
+            renderCharts(data.graficos);
+
+            btnDownload.href = '/download/' + data.arquivo_saida;
             successCard.style.display = 'block';
-            
+
             // Scroll para os resultados
             setTimeout(() => {
                 successCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
+        }
+
+        function truncateStr(str, n) {
+            return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
+        }
+
+        function renderCharts(graficos) {
+            const ctxProd = document.getElementById('produtosChart').getContext('2d');
+            const ctxForn = document.getElementById('fornecedoresChart').getContext('2d');
+
+            if (chartProdutos) chartProdutos.destroy();
+            if (chartFornecedores) chartFornecedores.destroy();
+
+            const pData = graficos.top_produtos || [];
+            chartProdutos = new Chart(ctxProd, {
+                type: 'bar',
+                data: {
+                    labels: pData.map(d => truncateStr(d.Produto, 15)),
+                    datasets: [{
+                        label: 'Valor de Estorno',
+                        data: pData.map(d => d.Valor_Estorno),
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            const fData = graficos.top_fornecedores || [];
+            chartFornecedores = new Chart(ctxForn, {
+                type: 'doughnut',
+                data: {
+                    labels: fData.map(d => truncateStr(d.Fornecedor, 20)),
+                    datasets: [{
+                        data: fData.map(d => d.Valor_Estorno),
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(236, 72, 153, 0.8)',
+                            'rgba(14, 165, 233, 0.8)', 'rgba(168, 85, 247, 0.8)', 'rgba(20, 184, 166, 0.8)', 'rgba(249, 115, 22, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                }
+            });
         }
 
         function showError(msg) {
@@ -975,4 +1235,5 @@
         }
     </script>
 </body>
+
 </html>
