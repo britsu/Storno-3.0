@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, render_template, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from engine import processar_planilha
+from .engine import processar_planilha
 
 app = Flask(__name__)
 
