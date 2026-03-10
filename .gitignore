@@ -1,0 +1,8 @@
+__pycache__/
+*.csv
+*.xlsx
+.env
+storno/uploads/*
+!storno/uploads/.gitkeep
+storno/outputs/*
+!storno/outputs/.gitkeep
