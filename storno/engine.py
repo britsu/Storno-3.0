@@ -9,7 +9,6 @@ REGRAS = {
     "Laticínios": {"prefixos": ["0401", "0402", "0403", "0404", "0405", "0406"], "percentual": 0.40},
     "Arroz": {"prefixos": ["1006"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Feijão": {"prefixos": ["0713"], "percentual": 0.65, "macro": "Cesta Básica"},
-    "Farinha de Trigo": {"prefixos": ["1101"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Farinha de Mandioca": {"prefixos": ["110620"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Fubá de Milho": {"prefixos": ["110220"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Açúcar Cristal": {"prefixos": ["170114", "170199", "1701"], "percentual": 0.65, "macro": "Cesta Básica"},
