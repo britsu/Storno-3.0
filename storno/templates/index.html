@@ -8,6 +8,9 @@
     <!-- Google Fonts: Outfit for a modern, geometric look -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -84,7 +87,8 @@
             align-items: center;
             justify-content: center;
             gap: 1.25rem;
-            padding: 0 2rem;
+            padding: 0 1.5rem;
+            flex-wrap: wrap;
         }
 
         .logo-icon {
@@ -99,6 +103,7 @@
             box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
             transform: rotate(-5deg);
             transition: var(--transition);
+            flex-shrink: 0;
         }
 
         .logo-icon:hover {
@@ -141,7 +146,7 @@
         main {
             width: 100%;
             max-width: 1000px;
-            padding: 3rem 2rem;
+            padding: 3rem 1.25rem;
             flex: 1;
         }
 
@@ -149,7 +154,7 @@
         .upload-widget {
             background: var(--surface-color);
             border-radius: var(--radius-lg);
-            padding: 3rem;
+            padding: 2.5rem;
             box-shadow: var(--shadow-lg);
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -170,7 +175,7 @@
         .upload-area {
             border: 2px dashed #cbd5e1;
             border-radius: var(--radius-md);
-            padding: 4rem 2rem;
+            padding: 3.5rem 1.5rem;
             text-align: center;
             transition: var(--transition);
             cursor: pointer;
@@ -228,7 +233,7 @@
 
         .upload-area h3 {
             margin: 0 0 0.5rem 0;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--primary);
             font-weight: 700;
         }
@@ -319,11 +324,12 @@
         /* File Info Badge */
         .file-info {
             display: none;
-            /* hidden by default */
             align-items: center;
             justify-content: space-between;
-            margin-top: 2rem;
-            padding: 1rem 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
             background: #f8fafc;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
@@ -338,6 +344,8 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            min-width: 0;
+            flex: 1;
         }
 
         .file-icon {
@@ -346,12 +354,16 @@
             padding: 10px;
             border-radius: 10px;
             display: flex;
+            flex-shrink: 0;
         }
 
         .file-name {
             font-weight: 600;
             color: var(--primary);
             font-size: 1.05rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .file-size {
@@ -371,6 +383,7 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
+            flex-shrink: 0;
         }
 
         .file-remove:hover {
@@ -421,7 +434,7 @@
         .result-card {
             background: var(--surface-color);
             border-radius: var(--radius-lg);
-            padding: 3rem;
+            padding: 2.5rem;
             margin-top: 2rem;
             box-shadow: var(--shadow-lg);
             display: none;
@@ -446,7 +459,8 @@
             display: flex;
             align-items: center;
             gap: 1.25rem;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         .status-icon {
@@ -457,6 +471,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8rem;
+            flex-shrink: 0;
         }
 
         .success-icon {
@@ -473,7 +488,7 @@
 
         .result-header h3 {
             margin: 0 0 0.25rem 0;
-            font-size: 1.75rem;
+            font-size: 1.6rem;
             color: var(--primary);
             font-weight: 800;
         }
@@ -486,20 +501,18 @@
 
         /* KPI Stats */
         .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-box {
             background: #f8fafc;
-            padding: 1.75rem;
+            padding: 1.5rem;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
             transition: var(--transition);
+            height: 100%;
         }
 
         .stat-box:hover {
@@ -509,7 +522,7 @@
         }
 
         .stat-value {
-            font-size: 2.25rem;
+            font-size: 2rem;
             font-weight: 800;
             color: var(--primary);
             margin-bottom: 0.5rem;
@@ -523,11 +536,24 @@
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
+        }
+
+        /* Mini stats box */
+        .mini-stats-box {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.75rem;
+            height: 100%;
         }
 
         /* View Toggles */
@@ -537,6 +563,7 @@
             background: #f1f5f9;
             padding: 0.25rem;
             border-radius: var(--radius-full);
+            flex-shrink: 0;
         }
 
         .toggle-btn {
@@ -549,6 +576,7 @@
             color: var(--text-muted);
             cursor: pointer;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .toggle-btn.active {
@@ -559,20 +587,23 @@
 
         /* Table Styling */
         .table-title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
         .table-container {
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             overflow-x: auto;
-            margin-bottom: 2.5rem;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 2rem;
             box-shadow: var(--shadow-sm);
             background: white;
         }
@@ -581,12 +612,13 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            min-width: 600px;
         }
 
         th,
         td {
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.25rem;
             text-align: left;
             white-space: nowrap;
         }
@@ -596,7 +628,7 @@
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
             border-bottom: 2px solid var(--border-color);
             position: sticky;
@@ -625,9 +657,9 @@
         .category-tag {
             background: var(--border-color);
             color: var(--primary);
-            padding: 0.35rem 0.85rem;
+            padding: 0.3rem 0.75rem;
             border-radius: var(--radius-full);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
         }
@@ -666,7 +698,7 @@
         .money-estorno {
             color: var(--success);
             background: var(--success-light);
-            padding: 0.35rem 0.75rem;
+            padding: 0.3rem 0.65rem;
             border-radius: 6px;
             font-weight: 700;
         }
@@ -690,6 +722,7 @@
 
         .btn-download:hover {
             background: #059669;
+            color: white;
             transform: translateY(-3px);
             box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
         }
@@ -709,10 +742,7 @@
 
         /* Charts Area */
         .charts-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             margin-top: 1rem;
         }
 
@@ -722,20 +752,32 @@
             border-radius: var(--radius-md);
             padding: 1.5rem;
             box-shadow: var(--shadow-sm);
+            height: 100%;
         }
 
         .chart-box h4 {
             margin: 0 0 1rem 0;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--primary);
             text-align: center;
+            font-weight: 700;
+        }
+
+        /* Scroll hint for mobile table */
+        .table-scroll-hint {
+            display: none;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-bottom: 0.4rem;
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
 
             .upload-widget,
             .result-card {
-                padding: 1.5rem;
+                padding: 1.5rem 1.25rem;
             }
 
             .upload-area {
@@ -747,8 +789,20 @@
                 text-align: center;
             }
 
+            .header-text {
+                align-items: center;
+            }
+
             .stat-value {
-                font-size: 1.75rem;
+                font-size: 1.65rem;
+            }
+
+            .btn-outline {
+                width: 100%;
+            }
+
+            .table-scroll-hint {
+                display: block;
             }
         }
     </style>
@@ -806,7 +860,7 @@
                                 d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                         </svg>
                     </div>
-                    <div>
+                    <div style="min-width:0;">
                         <div class="file-name" id="file-name-text">planilha.xlsx</div>
                         <div class="file-size" id="file-size-text">0 KB</div>
                     </div>
@@ -841,36 +895,55 @@
                 </div>
             </div>
 
+            <!-- KPI Cards — Bootstrap grid -->
             <div class="summary-stats">
-                <div class="stat-box">
-                    <div class="stat-label">Total a Estornar</div>
-                    <div class="stat-value highlight" id="stat-total-valor">R$ 0,00</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Estorno Laticínios</div>
-                    <div class="stat-value" id="stat-total-laticinios" style="color: var(--error);">R$ 0,00</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Estorno Cesta Básica</div>
-                    <div class="stat-value" id="stat-total-cesta" style="color: var(--success);">R$ 0,00</div>
-                </div>
-                <!-- Mini stat indicators for lines -->
-                <div style="display: flex; gap: 1rem; flex-direction: column; justify-content: center;">
-                    <div class="stat-label" style="font-size: 0.8rem">Lidos: <span id="stat-total-linhas"
-                            style="color:var(--primary); font-weight: 700;">0</span></div>
-                    <div class="stat-label" style="font-size: 0.8rem">C/ Estorno: <span id="stat-linhas-estorno"
-                            style="color:var(--primary); font-weight: 700;">0</span></div>
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-box">
+                            <div class="stat-label">Total a Estornar</div>
+                            <div class="stat-value highlight" id="stat-total-valor">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-box">
+                            <div class="stat-label">Estorno Laticínios</div>
+                            <div class="stat-value" id="stat-total-laticinios" style="color: var(--error);">R$ 0,00
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-box">
+                            <div class="stat-label">Estorno Cesta Básica</div>
+                            <div class="stat-value" id="stat-total-cesta" style="color: var(--success);">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="mini-stats-box">
+                            <div class="stat-label" style="font-size: 0.8rem">Linhas Lidas: <span id="stat-total-linhas"
+                                    style="color:var(--primary); font-weight: 700;">0</span></div>
+                            <div class="stat-label" style="font-size: 0.8rem">Com Estorno: <span
+                                    id="stat-linhas-estorno" style="color:var(--primary); font-weight: 700;">0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Charts — Bootstrap grid -->
             <div class="charts-container">
-                <div class="chart-box">
-                    <h4>Top 10 Produtos</h4>
-                    <canvas id="produtosChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <h4>Top 10 Fornecedores</h4>
-                    <canvas id="fornecedoresChart"></canvas>
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="chart-box">
+                            <h4>Top 10 Produtos</h4>
+                            <canvas id="produtosChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="chart-box">
+                            <h4>Top 10 Fornecedores</h4>
+                            <canvas id="fornecedoresChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -881,6 +954,7 @@
                     <button class="toggle-btn" data-view="nota">Por Nota</button>
                 </div>
             </div>
+            <div class="table-scroll-hint">← deslize para ver mais →</div>
             <div class="table-container">
                 <table>
                     <thead id="preview-thead">
@@ -921,6 +995,11 @@
         </div>
 
     </main>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmFXgtL1M2DgNkl8K4l20i7Z3a5g"
+        crossorigin="anonymous"></script>
 
     <script>
         const dropZone = document.getElementById('drop-zone');
