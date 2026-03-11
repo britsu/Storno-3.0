@@ -11,9 +11,6 @@ REGRAS = {
     "Feijão": {"prefixos": ["0713"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Farinha de Mandioca": {"prefixos": ["110620"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Fubá de Milho": {"prefixos": ["110220"], "percentual": 0.65, "macro": "Cesta Básica"},
-    "Açúcar Cristal": {"prefixos": ["170114", "170199", "1701"], "percentual": 0.65, "macro": "Cesta Básica"},
-    "Óleo de Soja": {"prefixos": ["1507"], "percentual": 0.65, "macro": "Cesta Básica"},
-    "Café": {"prefixos": ["0901"], "percentual": 0.65, "macro": "Cesta Básica"},
     "Sal": {"prefixos": ["2501"], "percentual": 0.65, "macro": "Cesta Básica"},
 }
 
